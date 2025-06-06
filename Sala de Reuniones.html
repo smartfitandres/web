@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de Reuniones Smart Fit</title>
+    <style>
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .background-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .contenedor {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            padding: 30px 50px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+        }              
+        img.logo {
+            width: 250px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin: 10px 0;
+        }
+        h2 {
+            font-size: 20px;
+            margin: 5px 0 30px 0;
+            font-weight: normal;
+        }
+        .botones {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .boton {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .boton img {
+            height: 100px;
+            width: 100px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        .boton:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .contenedor {
+                padding: 20px;
+                width: 85%;
+            }
+            .botones {
+                gap: 20px;
+            }
+            .boton img {
+                height: 80px;
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-slideshow">
+        <div class="background-image" style="background-image: url('imagenes/cielofit.jpg'); opacity: 1;"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernafit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/espejofit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernasfit2.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/salaracefit.jpg');"></div>
+    </div>
+    
+    <div class="contenedor">
+        <img src="imagenes/logo-smartfit.png" alt="Logo Smart Fit" class="logo">
+        <img src="imagenes/logo-bioritmo.png" alt="Logo Bio Ritmo" class="logo">
+        <h1>BIENVENIDOS</h1>
+        <h2>BEM-VINDOS</h2>
+        <div class="botones">
+            <a class="boton" href="https://meet.google.com" target="_blank">
+                <img src="imagenes/logo-meet.png" alt="Meet">
+                Meet
+            </a>
+            <a class="boton" href="https://zoom.us/join" target="_blank">
+                <img src="imagenes/logo-zoom.png" alt="Zoom">
+                Zoom
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backgrounds = document.querySelectorAll('.background-image');
+            let currentIndex = 0;
+            
+            // Función para cambiar el fondo
+            function changeBackground() {
+                // Ocultar todos los fondos
+                backgrounds.forEach(bg => {
+                    bg.style.opacity = 0;
+                });
+                
+                // Mostrar el siguiente fondo
+                currentIndex = (currentIndex + 1) % backgrounds.length;
+                backgrounds[currentIndex].style.opacity = 1;
+                
+                // Programar el próximo cambio
+                setTimeout(changeBackground, 10000); // Cambiar cada 10 segundos
+            }
+            
+            // Iniciar el temporizador para el cambio de fondo
+            setTimeout(changeBackground, 10000); // Primer cambio después de 10 segundos
+        });
+    </script>
+</body>
+</html>
