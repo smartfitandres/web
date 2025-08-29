@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UsoSala</title>
+    <style>
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px 0;
+            color: white;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .background-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .contenedor {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 40px 50px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-width: 900px;
+            width: 90%;
+            margin: 80px auto 120px auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        img.logo {
+            width: 250px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin: 10px 0 30px 0;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin: 40px 0 20px 0;
+            font-weight: bold;
+            color: #ff6b35;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 14px;
+            margin: 5px 0 30px 0;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        /* Menú Indicador */
+        .menu-indicator {
+            position: fixed;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .menu-indicator:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1));
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .menu-indicator:hover .menu-arrow::before {
+            border-right: 12px solid rgba(255, 255, 255, 1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+        }
+
+        .menu-indicator:hover .menu-text {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+                0 0 25px rgba(255, 255, 255, 0.5);
+        }
+
+        .menu-arrow {
+            width: 25px;
+            height: 25px;
+            position: relative;
+        }
+
+        .menu-arrow::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 12px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Sección de pasos mejorada */
+        .pasos-container {
+            margin: 40px 0;
+        }
+
+        .paso {
+            margin: 30px 0;
+            text-align: left;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ffc107;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paso::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 107, 53, 0.02));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .paso:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        .paso:hover::before {
+            opacity: 1;
+        }
+
+        .paso-numero {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .paso-titulo {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+
+        .paso-descripcion {
+            font-size: 16px;
+            line-height: 1.7;
+            margin: 15px 0;
+            opacity: 0.9;
+            padding-left: 60px;
+            position: relative;
+        }
+
+        .paso-descripcion::before {
+            content: '•';
+            color: #ffc107;
+            font-size: 20px;
+            position: absolute;
+            left: 30px;
+            top: 0;
+        }
+
+        /* Mensaje final mejorado */
+        .mensaje-final {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 107, 53, 0.1));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mensaje-final h2 {
+            margin: 0;
+            font-size: 28px;
+            background: white;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Footer mejorado */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 97%;
+            height: 45px;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 30px;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .footer-logos img {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.8;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-text {
+            position: absolute;
+            right: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: right;
+        }
+
+        /* Scroll personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ff8c5a, #ffaa80);
+        }
+
+        /* Animaciones de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .contenedor {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .paso {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .paso:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .paso:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .paso:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .paso:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contenedor {
+                padding: 30px 25px;
+                width: 95%;
+                margin: 60px auto 100px auto;
+            }
+
+            h1 {
+                font-size: 26px;
+                line-height: 1.3;
+            }
+
+            .paso {
+                padding: 20px;
+                margin: 25px 0;
+            }
+
+            .paso-titulo {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .paso-numero {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+                margin-right: 15px;
+            }
+
+            .paso-descripcion {
+                font-size: 15px;
+                padding-left: 50px;
+            }
+
+            .paso-descripcion::before {
+                left: 25px;
+            }
+
+            .mensaje-final {
+                padding: 25px;
+                margin: 30px 0;
+            }
+
+            .mensaje-final h2 {
+                font-size: 24px;
+            }
+
+            .menu-indicator {
+                left: 10px;
+                opacity: 0.7;
+                gap: 8px;
+            }
+
+            .menu-text {
+                font-size: 12px;
+            }
+
+            .footer {
+                height: 50px;
+                padding: 0 15px;
+            }
+
+            .footer-logos img {
+                height: 25px;
+            }
+
+            .footer-text {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contenedor {
+                padding: 25px 20px;
+                margin: 40px auto 80px auto;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .paso-descripcion {
+                padding-left: 0;
+                margin-left: 0;
+            }
+
+            .paso-descripcion::before {
+                left: 0;
+            }
+
+            .paso-titulo {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-slideshow">
+        <div class="background-image" style="background-image: url('imagenes/cielofit.jpg'); opacity: 1;"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernafit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/espejofit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernasfit2.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/salaracefit.jpg');"></div>
+    </div>
+
+    <div class="menu-indicator">
+        <div class="menu-arrow"></div>
+        <span class="menu-text">Ayuda</span>
+    </div>
+
+    <div class="contenedor">
+        <img src="imagenes/logo-smartfit.png" alt="Logo Smart Fit" class="logo">
+        <h1>Normas de uso y orden en la Sala de Reuniones</h1>
+
+        <div class="pasos-container">
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">1</span>
+                    Uso de la TV y Equipos
+                </div>
+                <div class="paso-descripcion">
+                    Enciende la TV y dispositivos solo cuando los necesites.
+                </div>
+                <div class="paso-descripcion">
+                    Conéctate de forma inalámbrica (AirPlay, Windows + K, o HDMI) evitando cables innecesarios en el
+                    suelo.
+                </div>
+                <div class="paso-descripcion">
+                    Al terminar, apaga la TV, desconecta cables y deja los controles remotos en su lugar.
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">2</span>
+                    Orden y Limpieza
+                </div>
+                <div class="paso-descripcion">
+                    No comer dentro de la sala (o, si se permite, recoge todo al terminar).
+                </div>
+                <div class="paso-descripcion">
+                    Deja la pizarra borrada y limpia.
+                </div>
+                <div class="paso-descripcion">
+                    Revisa que no queden objetos personales, documentos o basura.
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">3</span>
+                    Uso del Espacio y Horarios
+                </div>
+                <div class="paso-descripcion">
+                    Respeta los horarios de inicio y término de la reunión para no retrasar a otros.
+                </div>
+                <div class="paso-descripcion">
+                    Si necesitas más tiempo, revisa si la sala está disponible antes de extender la reunión.
+                </div>
+                <div class="paso-descripcion">
+                    No ingreses antes de tu horario si la sala ya está ocupada.
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">4</span>
+                    Respeto y Consideración
+                </div>
+                <div class="paso-descripcion">
+                    Hablar en un volumen moderado.
+                </div>
+                <div class="paso-descripcion">
+                    Cerrar la puerta para evitar interrupciones o ruidos hacia afuera.
+                </div>
+                <div class="paso-descripcion">
+                    Evitar dejar configuradas cuentas personales en la TV o en los equipos.
+                </div>
+            </div>
+        </div>
+
+        <div class="mensaje-final">
+            <h2>Si eres Smart, Sabes 💪</h2>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-logos">
+            <img src="imagenes/banner.png" alt="Banner">
+        </div>
+        <div class="footer-text">
+            Smart Fit - Todos los derechos reservados. Versión 1.0
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const backgrounds = document.querySelectorAll('.background-image');
+            let currentIndex = 0;
+
+            // Función para cambiar el fondo
+            function changeBackground() {
+                backgrounds.forEach(bg => {
+                    bg.style.opacity = 0;
+                });
+
+                currentIndex = (currentIndex + 1) % backgrounds.length;
+                backgrounds[currentIndex].style.opacity = 1;
+
+                setTimeout(changeBackground, 10000);
+            }
+
+            setTimeout(changeBackground, 10000);
+        });
+
+        // Smooth scroll para una mejor experiencia
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+
+</html>
