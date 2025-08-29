@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransmitirPantalla</title>
+    <style>
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px 0;
+        }
+
+        .background-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        /* Contenedor principal */
+        .contenedor {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px 50px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+            margin-bottom: 100px;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        img.logo {
+            width: 250px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 10px 0 30px 0;
+            color: #fff;
+        }
+
+        /* Opciones de sistema */
+        .opciones-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .opcion-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px 20px;
+            min-width: 200px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .opcion-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .opcion-card.active {
+            border-color: #fafafa;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 107, 53, 0.1));
+        }
+
+        .opcion-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .opcion-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .opcion-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Contenido desplegable */
+        .contenido-desplegable {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 0 30px;
+        }
+
+        .contenido-desplegable.activo {
+            max-height: 2000px;
+            padding: 30px;
+        }
+
+        .paso {
+            margin: 25px 0;
+            text-align: left;
+            border-left: 4px solid #ffc107;
+            padding-left: 20px;
+        }
+
+        .paso-numero {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+
+        .paso-titulo {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .paso-descripcion {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        .paso-imagen {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .advertencia {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .advertencia-titulo {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Menú Indicador */
+        .menu-indicator {
+            position: fixed;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .menu-indicator:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1));
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .menu-indicator:hover .menu-arrow::before {
+            border-right: 12px solid rgba(255, 255, 255, 1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+        }
+
+        .menu-indicator:hover .menu-text {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+                0 0 25px rgba(255, 255, 255, 0.5);
+        }
+
+        .menu-arrow {
+            width: 25px;
+            height: 25px;
+            position: relative;
+        }
+
+        .menu-arrow::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 12px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 97%;
+            height: 35px;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 30px;
+            z-index: 50;
+        }
+
+        .footer-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .footer-logos img {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.8;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-text {
+            position: absolute;
+            right: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: right;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contenedor {
+                padding: 20px 25px;
+                margin-bottom: 80px;
+            }
+
+            .opciones-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .opcion-card {
+                min-width: auto;
+            }
+
+            .contenido-desplegable.activo {
+                padding: 20px;
+            }
+
+            .paso {
+                margin: 20px 0;
+                padding-left: 15px;
+            }
+
+            .menu-indicator {
+                left: 10px;
+                opacity: 0.7;
+            }
+
+            .menu-text {
+                font-size: 12px;
+            }
+
+            .footer {
+                height: 50px;
+                padding: 0 15px;
+            }
+
+            .footer-logos img {
+                height: 25px;
+            }
+
+            .footer-text {
+                font-size: 10px;
+            }
+        }
+
+        /* Scroll personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ff8c5a, #ffaa80);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-slideshow">
+        <div class="background-image" style="background-image: url('imagenes/cielofit.jpg'); opacity: 1;"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernafit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/espejofit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernasfit2.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/salaracefit.jpg');"></div>
+    </div>
+
+    <div class="menu-indicator">
+        <div class="menu-arrow"></div>
+        <span class="menu-text">Ayuda</span>
+    </div>
+
+    <div class="contenedor">
+        <img src="imagenes/logo-smartfit.png" alt="Logo Smart Fit" class="logo">
+        <h1>Cómo Transmitir Pantalla a la TV</h1>
+
+        <div class="opciones-container">
+            <div class="opcion-card" onclick="mostrarContenido('windows')">
+                <div class="opcion-icon">💻</div>
+                <div class="opcion-title">Windows</div>
+                <div class="opcion-subtitle">Desde Notebook a TV</div>
+            </div>
+
+            <div class="opcion-card" onclick="mostrarContenido('mac')">
+                <div class="opcion-icon">💻</div>
+                <div class="opcion-title">Mac</div>
+                <div class="opcion-subtitle">Desde Mac a TV</div>
+            </div>
+        </div>
+
+        <!-- Contenido para Windows -->
+        <div id="contenido-windows" class="contenido-desplegable">
+            <div class="advertencia">
+                <div class="advertencia-titulo">
+                    ⚠️ Importante
+                </div>
+                <div>Asegúrate de que tu notebook con Windows y la TV estén conectados a la misma red Wi-Fi.</div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">1</span>
+                    Activar Wi-Fi en Windows en tu equipo
+                </div>
+                <div class="paso-descripcion">
+                    Ve a Configuración > Red e Internet > Wi-Fi y asegúrate de que esté activado y conectado a tu red.
+                </div>
+                <!-- <img src="imagenes/windows-wifi.jpg" alt="Activar Wi-Fi Windows" class="paso-imagen"> -->
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">2</span>
+                    Abre la función de proyección inalámbrica
+                </div>
+                <div class="paso-descripcion">
+                    Presiona las teclas Windows + K (o en algunas versiones Windows + P y luego selecciona Conectar a
+                    una pantalla inalámbrica).
+                </div>
+                <img src="imagenes/win+k.jpg" alt="Centro de Notificaciones" class="paso-imagen">
+                <div class="paso-descripcion">
+                    Aparecerá un panel lateral en la esquina inferior derecha mostrando las pantallas disponibles.
+                </div>
+                <img src="imagenes/win+k1.jpg" alt="Centro de Notificaciones" class="paso-imagen">
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">3</span>
+                    Selecciona tu TV o pantalla Samsung de la lista
+                </div>
+                <div class="paso-descripcion">
+                    La primera vez, en la pantalla del televisor aparecerá un mensaje de confirmación.
+                </div>
+                <!-- <img src="imagenes/windows-conectar.jpg" alt="Botón Conectar Windows" class="paso-imagen"> -->
+                <div class="paso-descripcion">
+                    Acéptalo para autorizar la conexión.
+                </div>
+                <img src="imagenes/permitir.jpg" alt="Botón Conectar Windows" class="paso-imagen">
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">4</span>
+                    ¡Listo!
+                </div>
+                <div class="paso-descripcion">
+                    Tu escritorio de Windows se duplicará o extenderá en la pantalla del TV de forma inalámbrica.
+                </div>
+                <!-- <img src="imagenes/windows-seleccionar-tv.jpg" alt="Seleccionar TV Windows" class="paso-imagen"> -->
+            </div>
+        </div>
+
+        <!-- Contenido para Mac -->
+        <div id="contenido-mac" class="contenido-desplegable">
+            <div class="advertencia">
+                <div class="advertencia-titulo">
+                    ⚠️ Importante
+                </div>
+                <div>Verifica que tu Mac y la TV estén conectados a la misma red Wi-Fi y que tu TV sea compatible con
+                    AirPlay.</div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">1</span>
+                    Activa el Wi-Fi en tu Mac.
+                </div>
+                <div class="paso-descripcion">
+                    Asegúrate de que tu Mac esté conectado a la misma red Wi-Fi que tu TV Samsung. Ve a Preferencias del
+                    Sistema > Red para verificar.
+                </div>
+                <!-- <img src="imagenes/mac-wifi.jpg" alt="Wi-Fi Mac" class="paso-imagen"> -->
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">2</span>
+                    Abre el Centro de Control en la parte superior derecha de la barra de menús.
+                </div>
+                <div class="paso-descripcion">
+                    Haz clic en el ícono del Centro de Control (dos interruptores superpuestos).
+                    Luego selecciona la opción Duplicar pantalla (AirPlay) como se muestra en la Imagen.
+                </div>
+                <img src="imagenes/mirrorscreen.jpg" alt="AirPlay Samsung TV" class="paso-imagen">
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">3</span>
+                    Elige la pantalla
+                </div>
+                <div class="paso-descripcion">
+                    Elige la pantalla o TV a la que te quieres conectar de la lista que aparece.
+                </div>
+                <img src="imagenes/mirrorscreen1.jpg" alt="Centro de Control Mac" class="paso-imagen">
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">4</span>
+                    Introduce el código de seguridad
+                </div>
+                <div class="paso-descripcion">
+                    En el televisor aparecerá un código la primera vez que te conectes.
+                </div>
+                <img src="imagenes/mirrorscreen2.jpg" alt="Seleccionar Samsung Mac" class="paso-imagen">
+                <div class="paso-descripcion">
+                    Escríbelo en tu Mac cuando se solicite.
+                </div>
+                <img src="imagenes/mirrorscreen3.jpg" alt="Configuración Pantalla Mac" class="paso-imagen">
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">5</span>
+                    ¡Listo!
+                </div>
+                <div class="paso-descripcion">
+                    La pantalla de tu Mac ahora estará duplicada o extendida en el televisor de manera inalámbrica.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-logos">
+            <img src="imagenes/banner.png" alt="Banner">
+        </div>
+        <div class="footer-text">
+            Smart Fit - Todos los derechos reservados. Versión 1.0
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const backgrounds = document.querySelectorAll('.background-image');
+            let currentIndex = 0;
+
+            // Función para cambiar el fondo
+            function changeBackground() {
+                backgrounds.forEach(bg => {
+                    bg.style.opacity = 0;
+                });
+
+                currentIndex = (currentIndex + 1) % backgrounds.length;
+                backgrounds[currentIndex].style.opacity = 1;
+
+                setTimeout(changeBackground, 10000);
+            }
+
+            setTimeout(changeBackground, 10000);
+        });
+
+        // Función para mostrar/ocultar contenido
+        function mostrarContenido(sistema) {
+            // Obtener todos los elementos
+            const windowsCard = document.querySelector('.opcion-card:nth-child(1)');
+            const macCard = document.querySelector('.opcion-card:nth-child(2)');
+            const windowsContenido = document.getElementById('contenido-windows');
+            const macContenido = document.getElementById('contenido-mac');
+
+            // Remover clases activas
+            windowsCard.classList.remove('active');
+            macCard.classList.remove('active');
+            windowsContenido.classList.remove('activo');
+            macContenido.classList.remove('activo');
+
+            // Activar el sistema seleccionado
+            if (sistema === 'windows') {
+                windowsCard.classList.add('active');
+                setTimeout(() => {
+                    windowsContenido.classList.add('activo');
+                }, 100);
+            } else if (sistema === 'mac') {
+                macCard.classList.add('active');
+                setTimeout(() => {
+                    macContenido.classList.add('activo');
+                }, 100);
+            }
+
+            // Scroll suave hacia el contenido
+            setTimeout(() => {
+                const contenedor = document.querySelector('.contenedor');
+                contenedor.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 200);
+        }
+
+        // Cerrar contenido si se hace clic en la misma opción
+        let ultimaOpcion = null;
+
+        function mostrarContenidoToggle(sistema) {
+            if (ultimaOpcion === sistema) {
+                // Si es la misma opción, ocultar todo
+                document.querySelectorAll('.opcion-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                document.querySelectorAll('.contenido-desplegable').forEach(contenido => {
+                    contenido.classList.remove('activo');
+                });
+                ultimaOpcion = null;
+            } else {
+                mostrarContenido(sistema);
+                ultimaOpcion = sistema;
+            }
+        }
+
+        // Actualizar el onclick en las tarjetas para usar toggle
+        document.querySelectorAll('.opcion-card').forEach((card, index) => {
+            const sistema = index === 0 ? 'windows' : 'mac';
+            card.onclick = () => mostrarContenidoToggle(sistema);
+        });
+        // Smooth scroll para una mejor experiencia
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+
+</html>
