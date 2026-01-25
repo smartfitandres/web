@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalaReunionesSmartFit</title>
+
+    <style>
+        /* ========== ANIMACIONES DE ENTRADA ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInButton {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px) translateY(-50%);
+            }
+            to {
+                opacity: 0.9;
+                transform: translateX(0) translateY(-50%);
+            }
+        }
+
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            padding: 15px 30px 42px 30px;
+        }
+
+        .background-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .contenedor {
+            background-color: rgba(0, 0, 0, 0.65);
+            border-radius: 18px;
+            padding: 20px 30px 22px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 950px;
+            max-height: calc(100vh - 65px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Animación */
+            opacity: 0;
+            animation: scaleIn 0.8s ease-out 0.2s forwards;
+        }
+
+        /* Header con logo y títulos */
+        .header-section {
+            text-align: center;
+            margin-bottom: 12px;
+            width: 100%;
+            /* Animación */
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out 0.4s forwards;
+        }
+
+        img.logo {
+            width: 200px;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin: 3px 0;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 14px;
+            margin: 2px 0 0 0;
+            font-weight: normal;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Contenedor principal: botones + calendario lado a lado */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            align-items: stretch;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Panel de botones (izquierda) */
+        .buttons-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 150px;
+            max-width: 150px;
+            justify-content: center;
+        }
+
+        .boton {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 12px 10px;
+            border-radius: 12px;
+            height: 88px;
+            cursor: pointer;
+            gap: 10px;
+            box-sizing: border-box;
+
+            /* Estética moderna */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+
+            /* Transiciones suaves y lentas */
+            transition: transform 0.5s ease-out,
+                        background 0.4s ease,
+                        border-color 0.4s ease,
+                        box-shadow 0.4s ease;
+
+            /* Animación sin transform para no interferir con hover */
+            opacity: 0;
+            animation: fadeInButton 0.6s ease-out forwards;
+        }
+
+        .boton:nth-child(1) { animation-delay: 0.5s; }
+        .boton:nth-child(2) { animation-delay: 0.65s; }
+        .boton:nth-child(3) { animation-delay: 0.8s; }
+
+        /* Contenedor del icono para tamaño uniforme */
+        .boton-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .boton img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        /* Estilos individuales para cada icono de botón */
+        .boton-icon-meet img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .boton-icon-zoom img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .boton-icon-teams img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .boton-texto {
+            text-align: center;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .boton:hover {
+            transform: scale(1.12);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.18);
+        }
+
+        /* Menú Indicador - Ayuda */
+        .menu-indicator {
+            position: fixed;
+            left: 1px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            /* Animación */
+            opacity: 0;
+            animation: slideInFromLeft 0.6s ease-out 1.2s forwards;
+        }
+
+        .menu-indicator:hover {
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .menu-arrow {
+            width: 16px;
+            height: 40px;
+            position: relative;
+            animation: pulse 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .menu-arrow::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 12px solid rgba(255, 255, 255, 0.85);
+            transition: all 0.3s ease;
+        }
+
+        .menu-indicator:hover .menu-arrow::before {
+            border-right-color: white;
+        }
+
+        .help-icon {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: all 0.3s ease;
+        }
+
+        .menu-indicator:hover .help-icon {
+            opacity: 1;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+        }
+
+        /* Panel del calendario (derecha) */
+        .calendar-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            /* Animación */
+            opacity: 0;
+            animation: fadeInRight 0.6s ease-out 0.6s forwards;
+        }
+
+        /* Widget de Calendario */
+        .calendar-widget {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 12px 14px 10px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .calendar-title {
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .calendar-title::before {
+            content: '📅';
+            font-size: 14px;
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .sala-selector {
+            padding: 6px 28px 6px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            background-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sala-selector:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .sala-selector option {
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .view-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(0, 0, 0, 0.35);
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .view-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .view-btn.active {
+            background-color: rgba(76, 175, 80, 0.4);
+            border-color: #4CAF50;
+            color: white;
+        }
+
+        .availability-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .available {
+            background-color: rgba(76, 175, 80, 0.25);
+            border: 1px solid #4CAF50;
+            color: #81C784;
+        }
+
+        .busy {
+            background-color: rgba(244, 67, 54, 0.25);
+            border: 1px solid #F44336;
+            color: #E57373;
+        }
+
+        .calendar-container {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+        }
+
+        .calendar-container iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+            display: block;
+        }
+
+
+        .calendar-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .current-time span {
+            font-weight: bold;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 32px;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            z-index: 50;
+            box-sizing: border-box;
+            /* Animación */
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out 1s forwards;
+        }
+
+        .footer-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .footer-logos img {
+            height: 20px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.75;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-text {
+            position: absolute;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 9px;
+            text-align: right;
+        }
+
+        @media (max-width: 1024px) {
+            body {
+                padding: 10px 25px 40px 25px;
+            }
+
+            .menu-indicator {
+                left: 6px;
+            }
+
+            .help-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .menu-arrow {
+                height: 32px;
+            }
+
+            .buttons-panel {
+                gap: 10px;
+            }
+
+            .boton {
+                min-width: 110px;
+                padding: 8px 12px;
+                gap: 6px;
+            }
+
+            .boton-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .boton img {
+                max-height: 24px;
+                max-width: 24px;
+            }
+
+            .boton-icon-meet img,
+            .boton-icon-zoom img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .calendar-container iframe {
+                height: 2000px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 8px 15px 38px 15px;
+            }
+
+            .menu-indicator {
+                display: none;
+            }
+
+            .contenedor {
+                padding: 14px;
+                max-height: calc(100vh - 50px);
+            }
+
+            img.logo {
+                width: 110px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            h2 {
+                font-size: 13px;
+            }
+
+            .buttons-panel {
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .boton {
+                min-width: 100px;
+                padding: 8px 10px;
+                font-size: 10px;
+                gap: 5px;
+            }
+
+            .boton-icon {
+                width: 22px;
+                height: 22px;
+            }
+
+            .boton img {
+                max-height: 22px;
+                max-width: 22px;
+            }
+
+            .boton-icon-meet img,
+            .boton-icon-zoom img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .calendar-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .sala-selector {
+                width: 100%;
+            }
+
+            .view-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .view-btn {
+                flex: 1;
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+
+            .calendar-container iframe {
+                height: 250px;
+            }
+
+            .footer {
+                height: 30px;
+                padding: 0 12px;
+            }
+
+            .footer-logos img {
+                height: 18px;
+            }
+
+            .footer-text {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-slideshow">
+        <div class="background-image" style="background-image: url('imagenes/cielofit.jpg'); opacity: 1;"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernafit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/espejofit.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/mancuernasfit2.jpg');"></div>
+        <div class="background-image" style="background-image: url('imagenes/salaracefit.jpg');"></div>
+    </div>
+
+    <!-- Indicador de Menú - Ayuda -->
+    <div class="menu-indicator">
+        <div class="menu-arrow"></div>
+        <img src="imagenes/help-icon.png" alt="Ayuda" class="help-icon">
+    </div>
+
+    <div class="contenedor">
+        <!-- Header: Logo y Títulos -->
+        <div class="header-section">
+            <img src="imagenes/logo-smartfit.png" alt="Logo Smart Fit" class="logo">
+            <h1>BIENVENIDOS</h1>
+            <h2>BEM-VINDOS</h2>
+        </div>
+
+        <!-- Contenido Principal: Botones + Calendario -->
+        <div class="main-content">
+            <!-- Panel de Botones (Izquierda) -->
+            <div class="buttons-panel">
+                <a class="boton" href="https://meet.google.com" target="_blank">
+                    <div class="boton-icon boton-icon-meet">
+                        <img src="imagenes/logo-meet.png" alt="Meet">
+                    </div>
+                    <span class="boton-texto">Google Meet</span>
+                </a>
+                <a class="boton" href="https://zoom.us/join" target="_blank">
+                    <div class="boton-icon boton-icon-zoom">
+                        <img src="imagenes/logo-zoom.png" alt="Zoom">
+                    </div>
+                    <span class="boton-texto">Zoom</span>
+                </a>
+                <a class="boton" href="https://teams.live.com/free" target="_blank">
+                    <div class="boton-icon boton-icon-teams">
+                        <img src="imagenes/logo-teams.png" alt="Teams">
+                    </div>
+                    <span class="boton-texto">Microsoft Teams</span>
+                </a>
+            </div>
+
+            <!-- Panel del Calendario (Derecha) -->
+            <div class="calendar-panel">
+                <div class="calendar-widget">
+                    <div class="calendar-header">
+                        <div class="calendar-title">Smart Meet</div>
+                    </div>
+
+                    <div class="calendar-controls">
+                        <select class="sala-selector" id="salaSelector" onchange="cambiarSala()">
+                            <option value="c_188ak75hukuc0gvuhq8ihlqf2m7ck@resource.calendar.google.com">Sala Smart Fit</option>
+                            <option value="c_188d2qik2c924g5njn3sfubfpcq8c@resource.calendar.google.com">Sala Bio Ritmo</option>
+                            <option value="c_1881bgb1a82a4j70gqa866gsj8j2s@resource.calendar.google.com">Sala Total Pass</option>
+                            <option value="c_18891seuqfs06h2chia8tm3etj4qs@resource.calendar.google.com">Sala Jab</option>
+                            <option value="c_1884v95spll7uh2jkd28cdll9usls@resource.calendar.google.com">Sala Auditorio</option>
+                            <option value="c_188el2t0c5ne4jk3i4kd00e4vgs4s@resource.calendar.google.com">Sala Body</option>
+                            <option value="c_188darit18d3uh8ujcos2c71siae0@resource.calendar.google.com">Sala Coach</option>
+                            <option value="c_1881t34dsarocjj3jsc0aed8ganq4@resource.calendar.google.com">Sala Nutrí</option>
+                            <option value="c_188cu0o77m7t8ipii2o91138qteqo@resource.calendar.google.com">Sala One</option>
+                            <option value="c_1887h217u4v7kjtpl9mbdd67aek6g@resource.calendar.google.com">Sala Race</option>
+                            <option value="c_1886mbocsdiduhbfn48s4e87pia32@resource.calendar.google.com">Sala Tonus</option>
+                        </select>
+
+                        <div class="view-buttons">
+                            <button class="view-btn active" data-view="AGENDA" onclick="cambiarVista('AGENDA')">Agenda</button>
+                            <button class="view-btn" data-view="WEEK" onclick="cambiarVista('WEEK')">Semana</button>
+                            <button class="view-btn" data-view="MONTH" onclick="cambiarVista('MONTH')">Mes</button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-container">
+                        <iframe id="calendarFrame"
+                            src="https://calendar.google.com/calendar/embed?src=TU_CALENDAR_ID_SALA_1%40group.calendar.google.com&ctz=America%2FSantiago&mode=AGENDA&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0"
+                            frameborder="0" scrolling="yes">
+                        </iframe>
+                    </div>
+
+                    <div class="calendar-footer">
+                        <div class="current-time">Hora actual:<span id="currentTime">--:--</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-logos">
+            <img src="imagenes/banner.png" alt="Banner">
+        </div>
+        <div class="footer-text">
+            Smart Meet - Todos los derechos reservados. Versión 1.1
+        </div>
+    </div>
+
+    <script>
+        // Zona horaria
+        const timezone = 'America/Santiago';
+        let currentView = 'AGENDA';
+
+        // Mapeo de salas por nombre corto
+        const SALAS = {
+            'smartfit': 'c_188ak75hukuc0gvuhq8ihlqf2m7ck@resource.calendar.google.com',
+            'bioritmo': 'c_188d2qik2c924g5njn3sfubfpcq8c@resource.calendar.google.com',
+            'totalpass': 'c_1881bgb1a82a4j70gqa866gsj8j2s@resource.calendar.google.com',
+            'jab': 'c_18891seuqfs06h2chia8tm3etj4qs@resource.calendar.google.com',
+            'auditorio': 'c_1884v95spll7uh2jkd28cdll9usls@resource.calendar.google.com',
+            'body': 'c_188el2t0c5ne4jk3i4kd00e4vgs4s@resource.calendar.google.com',
+            'coach': 'c_188darit18d3uh8ujcos2c71siae0@resource.calendar.google.com',
+            'nutri': 'c_1881t34dsarocjj3jsc0aed8ganq4@resource.calendar.google.com',
+            'one': 'c_188cu0o77m7t8ipii2o91138qteqo@resource.calendar.google.com',
+            'race': 'c_1887h217u4v7kjtpl9mbdd67aek6g@resource.calendar.google.com',
+            'tonus': 'c_1886mbocsdiduhbfn48s4e87pia32@resource.calendar.google.com'
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar fondos
+            const backgrounds = document.querySelectorAll('.background-image');
+            let currentIndex = 0;
+
+            function changeBackground() {
+                backgrounds.forEach(bg => bg.style.opacity = 0);
+                currentIndex = (currentIndex + 1) % backgrounds.length;
+                backgrounds[currentIndex].style.opacity = 1;
+                setTimeout(changeBackground, 10000);
+            }
+            setTimeout(changeBackground, 10000);
+
+            // Inicializar reloj
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            // Verificar parámetro de sala en URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const salaParam = urlParams.get('sala');
+            const selector = document.getElementById('salaSelector');
+
+            if (salaParam && SALAS[salaParam.toLowerCase()]) {
+                // Sala fija por URL: seleccionar y ocultar selector
+                selector.value = SALAS[salaParam.toLowerCase()];
+                selector.classList.add('hidden');
+            }
+
+            // Cargar calendario inicial
+            actualizarCalendario();
+        });
+
+        function actualizarCalendario() {
+            const selector = document.getElementById('salaSelector');
+            const calendarFrame = document.getElementById('calendarFrame');
+            const selectedCalendarId = selector.value;
+
+            const encodedId = encodeURIComponent(selectedCalendarId);
+            const calendarUrl = `https://calendar.google.com/calendar/embed?src=${encodedId}&ctz=${timezone}&mode=${currentView}&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0`;
+
+            calendarFrame.src = calendarUrl;
+        }
+
+        function cambiarSala() {
+            actualizarCalendario();
+        }
+
+        function cambiarVista(vista) {
+            currentView = vista;
+
+            // Actualizar botones activos
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.view === vista) {
+                    btn.classList.add('active');
+                }
+            });
+
+            actualizarCalendario();
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('es-CL', options);
+        }
+    </script>
+</body>
+
+</html>
